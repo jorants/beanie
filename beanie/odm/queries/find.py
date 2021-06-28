@@ -12,6 +12,10 @@ from typing import (
     cast,
 )
 
+from pydantic import BaseModel
+from pymongo.client_session import ClientSession
+from pymongo.results import UpdateResult
+
 from beanie.exceptions import DocumentNotFound
 from beanie.odm.enums import SortDirection
 from beanie.odm.interfaces.aggregate import AggregateMethods
@@ -248,6 +252,33 @@ class FindQuery(SessionMethods, UpdateMethods, BaseCursorQuery):
         )
 
 
+
+
+    # def upsert(
+    #     self,
+    #     *args: Mapping[str, Any],
+    #     on_insert: "DocType",
+    #     session: Optional[ClientSession] = None
+    # ):
+    #     """
+    #     Create Update with modifications query
+    #     and provide search criteria there
+
+    #     :param args: *Mapping[str,Any] - the modifications to apply.
+    #     :param on_insert: DocType - document to insert if there is no matched
+    #     document in the collection
+    #     :param session: Optional[ClientSession]
+    #     :return: UpdateMany query
+    #     """
+    #     self.set_session(session)
+    #     return (
+    #         self.UpdateQueryType(
+    #             document_model=self.document_model,
+    #             find_query=self.get_filter_query(),
+    #         )
+    #         .upsert(*args, on_insert=on_insert)
+    #         .set_session(session=self.session)
+    #     )
 
     
 

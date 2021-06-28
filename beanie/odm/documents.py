@@ -37,7 +37,7 @@ from beanie.odm.models import (
 )
 from beanie.odm.operators.find.comparison import In
 from beanie.odm.queries.aggregation import AggregationQuery
-from beanie.odm.queries.find import FindOne, FindMany
+from beanie.odm.queries.find import FindQuery
 from beanie.odm.queries.update import UpdateMany
 from beanie.odm.utils.collection import collection_factory
 from beanie.odm.utils.dump import get_dict
@@ -159,58 +159,27 @@ class Document(BaseModel, UpdateMethods):
             document_id = parse_obj_as(cls.__fields__["id"].type_, document_id)
         return await cls.find_one({"_id": document_id}, session=session)
 
+    
+    
     @classmethod
     def find_one(
         cls,
         *args: Mapping[str, Any],
-        projection_model: Optional[Type[BaseModel]] = None,
-        session: Optional[ClientSession] = None,
-    ) -> FindOne:
+            session: Optional[ClientSession] = None,
+            projection_model: Optional[Type[BaseModel]] = None,
+    ) -> FindQuery:
         """
         Find one document by criteria.
-        Returns [FindOne](https://roman-right.github.io/beanie/api/queries/#findone) query object.
+        Returns [FindQuery](https://roman-right.github.io/beanie/api/queries/#findone) query object.
         When awaited this will either return a document or None if no document exists for the search criteria.
 
         :param args: *Mapping[str, Any] - search criteria
         :param projection_model: Optional[Type[BaseModel]] - projection model
         :param session: Optional[ClientSession] - pymongo session instance
-        :return: [FindOne](https://roman-right.github.io/beanie/api/queries/#findone) - find query instance
+        :return: [FindQuery](https://roman-right.github.io/beanie/api/queries/#findone) - find query instance
         """
-        return FindOne(document_model=cls).find_one(
+        return FindQuery(document_model=cls).find_one(
             *args,
-            projection_model=projection_model,
-            session=session,
-        )
-
-    @classmethod
-    def find_many(
-        cls,
-        *args: Mapping[str, Any],
-        skip: Optional[int] = None,
-        limit: Optional[int] = None,
-        sort: Union[None, str, List[Tuple[str, SortDirection]]] = None,
-        projection_model: Optional[Type[BaseModel]] = None,
-        session: Optional[ClientSession] = None,
-    ) -> FindMany:
-        """
-        Find many documents by criteria.
-        Returns [FindMany](https://roman-right.github.io/beanie/api/queries/#findmany) query object
-
-        :param args: *Mapping[str, Any] - search criteria
-        :param skip: Optional[int] - The number of documents to omit.
-        :param limit: Optional[int] - The maximum number of results to return.
-        :param sort: Union[None, str, List[Tuple[str, SortDirection]]] - A key
-        or a list of (key, direction) pairs specifying the sort order
-        for this query.
-        :param projection_model: Optional[Type[BaseModel]] - projection model
-        :param session: Optional[ClientSession] - pymongo session
-        :return: [FindMany](https://roman-right.github.io/beanie/api/queries/#findmany) - query instance
-        """
-        return FindMany(document_model=cls).find_many(
-            *args,
-            sort=sort,
-            skip=skip,
-            limit=limit,
             projection_model=projection_model,
             session=session,
         )
@@ -224,11 +193,44 @@ class Document(BaseModel, UpdateMethods):
         sort: Union[None, str, List[Tuple[str, SortDirection]]] = None,
         projection_model: Optional[Type[BaseModel]] = None,
         session: Optional[ClientSession] = None,
-    ) -> FindMany:
+    ) -> FindQuery:
         """
-        The same as find_many
+        Find documents by criteria.
+        Returns [FindQuery](https://roman-right.github.io/beanie/api/queries/#findmany) query object
+
+        :param args: *Mapping[str, Any] - search criteria
+        :param skip: Optional[int] - The number of documents to omit.
+        :param limit: Optional[int] - The maximum number of results to return.
+        :param sort: Union[None, str, List[Tuple[str, SortDirection]]] - A key
+        or a list of (key, direction) pairs specifying the sort order
+        for this query.
+        :param projection_model: Optional[Type[BaseModel]] - projection model
+        :param session: Optional[ClientSession] - pymongo session
+        :return: [FindQuery](https://roman-right.github.io/beanie/api/queries/#findmany) - query instance
         """
-        return cls.find_many(
+        return FindQuery(document_model=cls).find(
+            *args,
+            sort=sort,
+            skip=skip,
+            limit=limit,
+            projection_model=projection_model,
+            session=session,
+        )
+
+    @classmethod
+    def find_many(
+        cls,
+        *args: Mapping[str, Any],
+        skip: Optional[int] = None,
+        limit: Optional[int] = None,
+        sort: Union[None, str, List[Tuple[str, SortDirection]]] = None,
+        projection_model: Optional[Type[BaseModel]] = None,
+        session: Optional[ClientSession] = None,
+    ) -> FindQuery:
+        """
+        The same as find
+        """
+        return cls.find(
             *args,
             skip=skip,
             limit=limit,
@@ -245,9 +247,9 @@ class Document(BaseModel, UpdateMethods):
         sort: Union[None, str, List[Tuple[str, SortDirection]]] = None,
         projection_model: Optional[Type[BaseModel]] = None,
         session: Optional[ClientSession] = None,
-    ) -> FindMany:
+    ) -> FindQuery:
         """
-        Get all the documents
+        Get all the documents, same as find()
 
         :param skip: Optional[int] - The number of documents to omit.
         :param limit: Optional[int] - The maximum number of results to return.
@@ -256,7 +258,7 @@ class Document(BaseModel, UpdateMethods):
         for this query.
         :param projection_model: Optional[Type[BaseModel]] - projection model
         :param session: Optional[ClientSession] - pymongo session
-        :return: [FindMany](https://roman-right.github.io/beanie/api/queries/#findmany) - query instance
+        :return: [FindQuery](https://roman-right.github.io/beanie/api/queries/#findmany) - query instance
         """
         return cls.find_many(
             {},
@@ -275,7 +277,7 @@ class Document(BaseModel, UpdateMethods):
         sort: Union[None, str, List[Tuple[str, SortDirection]]] = None,
         projection_model: Optional[Type[BaseModel]] = None,
         session: Optional[ClientSession] = None,
-    ) -> FindMany:
+    ) -> FindQuery:
         """
         the same as find_all
         """
